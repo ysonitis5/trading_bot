@@ -1,4 +1,5 @@
 import time
+import logging
 from datetime import timedelta, datetime
 import ccxt
 import pandas as pd
@@ -9,6 +10,9 @@ import dontshare_config as ds
 '''
 capitulation bot based off volume or some sort of bot off volume
 '''
+
+logging.basicConfig(filename='log.log', encoding='utf-8', level=logging.DEBUG)
+
 
 kucoin: kucoinfutures = ccxt.kucoinfutures({
     'enableRateLimit': True,
@@ -25,10 +29,10 @@ marketdf = pd.DataFrame(kucoin.load_markets()).transpose()
 print(marketdf.to_string())
 '''
 
-symbol = 'BTC/USDT:USDT'
-pos_size = 20
-params = {'timeinforce': 'postonly', 'leverage': 5}
-target = 7
+symbol = 'LINK/USDT:USDT'
+pos_size = 1200
+params = {'timeinforce': 'postonly', 'leverage': 40}
+target = 15
 risktolerance = -5
 
 
@@ -136,6 +140,7 @@ def kill_switch():
 
     #limit close us
     print('killswitch engage >=D')
+    logging.info('position was closed')
     openposi = open_positions()[1]
     long = open_positions()[3]
     kill_size = open_positions()[2]
@@ -199,9 +204,11 @@ def pnl_close():
         if side == 'long':
             diff = current_price - entry_price
             long = True
+            sellprice = (((entry_price/100) * (target/leverage)) + entry_price)
         else:
             diff = entry_price - current_price
             long = False
+            sellprice = (entry_price - ((entry_price/100) * (target/leverage)))
 
         try:
             perc = round(((diff/entry_price) * leverage), 10)
@@ -209,7 +216,6 @@ def pnl_close():
             perc = 0
 
         perc = 100*perc
-        sellprice = (((entry_price/100) * (target/leverage)) + entry_price)
         print(f'This is our Current Price {current_price}$')
         print(f'This is our Target Price: {sellprice}$')
         print(f'this is our PNL percentage: {(perc)}%')
@@ -224,6 +230,7 @@ def pnl_close():
                 print(f'^___^ starting the kill switch ! {target} % hit !')
                 in_pos = True
                 pnl_close = True
+                logging.info(entry_price, sellprice, perc)
                 kill_switch()
             else:
                 in_pos = True
