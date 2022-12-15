@@ -4,11 +4,19 @@ from datetime import timedelta, datetime
 import ccxt
 import pandas as pd
 from ccxt import kucoinfutures
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import QFont
+
 
 import dontshare_config as ds
 
 '''
 capitulation bot based off volume or some sort of bot off volume
+'''
+
+
+'''
+exchange credentials
 '''
 
 logging.basicConfig(filename='log.log', encoding='utf-8', level=logging.DEBUG)
@@ -32,7 +40,7 @@ print(marketdf.to_string())
 symbol = 'LINK/USDT:USDT'
 pos_size = 1200
 params = {'timeinforce': 'postonly', 'leverage': 40}
-target = 15
+target = 25
 risktolerance = -5
 
 
@@ -309,6 +317,36 @@ def bot():
 
         print('we are in position already, not creating new orders right now..')
 
+
+'''
+GUI
+'''
+
+def main():
+    app = QApplication([])
+    window = QWidget()
+    window.setGeometry(100, 100, 200, 300)
+    window.setWindowTitle('Trading Bot')
+
+    layout = QVBoxLayout()
+
+    label = QLabel(window)
+    label.setText('Trading Bot v1')
+    label.setFont(QFont('Arial', 18))
+    label.move(50, 100)
+
+    button = QPushButton('Run Bot!')
+    button.clicked.connect(bot)
+
+    layout.addWidget(button)
+
+    window.setLayout(layout)
+    window.show()
+    app.exec()
+
+if __name__ == '__main__':
+    main()
+
 # Bootstrap by getting the most recent time that had minutes as a multiple of 5
 time_now = datetime.utcnow()  # Or .now() for local time
 prev_minute = time_now.minute - (time_now.minute % 1)
@@ -322,7 +360,7 @@ while True:
         time.sleep(time_to_wait)
 
         # Now do whatever you want
-        bot()
+        main()
     except:
         time.sleep(45)
 
@@ -331,4 +369,4 @@ while True:
         time.sleep(time_to_wait)
 
         # Now do whatever you want
-        bot()
+        main()
