@@ -4,4 +4,4 @@ This is a trading bot built with Python to trade on KuCoin Futures. Mainly utili
 
 New algorithms and trading methods can be easily implemented. Currently the bot uses EMAs to determine when to buy, sell or close a position.
 
-Will need a dontshare py file with two variables to keep KuCoin api credentials private
+Will need a dontshare file with two variables to store two KuCoin api credentials and keep them private from the main program.
